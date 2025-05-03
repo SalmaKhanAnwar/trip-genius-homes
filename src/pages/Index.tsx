@@ -8,6 +8,13 @@ import Footer from '@/components/Footer';
 
 const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [remoteWorkOnly, setRemoteWorkOnly] = useState(false);
+
+  const handleFilterChange = (filterType: string, value: boolean) => {
+    if (filterType === 'remoteWork') {
+      setRemoteWorkOnly(value);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -17,8 +24,14 @@ const Index = () => {
           selectedLocation={selectedLocation} 
           onLocationChange={setSelectedLocation} 
         />
-        <FilterToggle />
-        <PropertyGrid selectedLocation={selectedLocation} />
+        <FilterToggle 
+          filters={{ remoteWork: remoteWorkOnly }} 
+          onFilterChange={handleFilterChange}
+        />
+        <PropertyGrid 
+          selectedLocation={selectedLocation}
+          filters={{ remoteWorkOnly }}
+        />
       </main>
       <Footer />
     </div>

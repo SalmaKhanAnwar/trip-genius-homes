@@ -12,9 +12,10 @@ export interface Property {
   distance: string | null;
   availableFrom: string | null;
   availableTo: string | null;
+  remoteWorkFriendly: boolean;
 }
 
-export const useProperties = (location?: string) => {
+export const useProperties = (location?: string, filters?: { remoteWorkOnly?: boolean }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,10 +49,16 @@ export const useProperties = (location?: string) => {
           rating: item.rating,
           distance: item.distance,
           availableFrom: item.availablefrom,
-          availableTo: item.availableto
+          availableTo: item.availableto,
+          remoteWorkFriendly: item.remoteworkfriendly || false // Default to false if not present
         })) || [];
         
-        setProperties(transformedData);
+        // Apply remote work filter if specified
+        const filteredData = filters?.remoteWorkOnly
+          ? transformedData.filter(property => property.remoteWorkFriendly)
+          : transformedData;
+        
+        setProperties(filteredData);
       } catch (err) {
         console.error('Error fetching properties:', err);
         setError('Failed to load properties');
@@ -61,7 +68,7 @@ export const useProperties = (location?: string) => {
     };
 
     fetchProperties();
-  }, [location]);
+  }, [location, filters?.remoteWorkOnly]);
 
   return { properties, loading, error };
 };

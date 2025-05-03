@@ -5,10 +5,13 @@ import { useProperties, Property } from '@/hooks/use-properties';
 
 interface PropertyGridProps {
   selectedLocation: string;
+  filters?: {
+    remoteWorkOnly?: boolean;
+  };
 }
 
-const PropertyGrid: React.FC<PropertyGridProps> = ({ selectedLocation }) => {
-  const { properties, loading, error } = useProperties(selectedLocation);
+const PropertyGrid: React.FC<PropertyGridProps> = ({ selectedLocation, filters }) => {
+  const { properties, loading, error } = useProperties(selectedLocation, filters);
 
   if (loading) {
     return (
