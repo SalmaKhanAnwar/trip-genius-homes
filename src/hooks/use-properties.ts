@@ -38,7 +38,20 @@ export const useProperties = (location?: string) => {
           throw error;
         }
         
-        setProperties(data || []);
+        // Transform the data to match the Property interface
+        const transformedData = data?.map(item => ({
+          id: item.id,
+          name: item.name,
+          location: item.location,
+          imageUrl: item.imageurl,
+          pricePerNight: item.pricepernight,
+          rating: item.rating,
+          distance: item.distance,
+          availableFrom: item.availablefrom,
+          availableTo: item.availableto
+        })) || [];
+        
+        setProperties(transformedData);
       } catch (err) {
         console.error('Error fetching properties:', err);
         setError('Failed to load properties');
