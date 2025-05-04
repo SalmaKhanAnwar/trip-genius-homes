@@ -74,6 +74,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
+  // Handle carousel index change
+  const handleCarouselChange = (index: number) => {
+    setActiveImageIndex(index);
+  };
+
   return (
     <div 
       className="flex flex-col space-y-2 group"
@@ -128,7 +133,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             {/* Image Carousel */}
             <Carousel 
               className="w-full h-full" 
-              onSelect={(index) => setActiveImageIndex(index)}
+              onSelect={handleCarouselChange}
             >
               <CarouselContent className="h-full">
                 {images.map((image, index) => (
