@@ -39,7 +39,8 @@ export const useGemini = (defaultConfig?: Partial<GeminiConfig>) => {
     setError(null);
 
     try {
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", {
+      // Updated to use the correct API endpoint
+      const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
