@@ -40,19 +40,29 @@ export const useProperties = (location?: string, filters?: { remoteWorkOnly?: bo
         }
         
         // Transform the data to match the Property interface
-        const transformedData = data?.map(item => ({
-          id: item.id,
-          name: item.name,
-          location: item.location,
-          imageUrl: item.imageurl,
-          pricePerNight: item.pricepernight,
-          rating: item.rating,
-          distance: item.distance,
-          availableFrom: item.availablefrom,
-          availableTo: item.availableto,
-          // Handle the case where remoteworkfriendly might not exist in the data
-          remoteWorkFriendly: item.remoteworkfriendly === true
-        })) || [];
+        const transformedData = data?.map(item => {
+          // First, create a typed object with the properties we know exist
+          const property: Property = {
+            id: item.id,
+            name: item.name,
+            location: item.location,
+            imageUrl: item.imageurl,
+            pricePerNight: item.pricepernight,
+            rating: item.rating,
+            distance: item.distance,
+            availableFrom: item.availablefrom,
+            availableTo: item.availableto,
+            // Safely handle the remoteworkfriendly property which might not be in the type definition
+            remoteWorkFriendly: false
+          };
+          
+          // Then check if the remoteworkfriendly property exists in the raw data and is true
+          if ('remoteworkfriendly' in item && item.remoteworkfriendly === true) {
+            property.remoteWorkFriendly = true;
+          }
+          
+          return property;
+        }) || [];
         
         // Apply remote work filter if specified
         const filteredData = filters?.remoteWorkOnly
