@@ -7,6 +7,9 @@ interface PropertyGridProps {
   selectedLocation: string;
   filters?: {
     remoteWorkOnly?: boolean;
+    showVirtualTours?: boolean;
+    showSuperhost?: boolean;
+    flexibleDates?: boolean;
   };
 }
 
@@ -32,7 +35,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({ selectedLocation, filters }
   if (properties.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p>No properties found for this location.</p>
+        <p>No properties found for this location and filters.</p>
       </div>
     );
   }
@@ -53,6 +56,9 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({ selectedLocation, filters }
     // Calculate total price
     const totalPrice = `${property.pricePerNight * nights}`;
     
+    // Mock data for demo - In a real app, this would come from the database
+    const hasVirtualTour = property.id.charAt(0) === 'a' || property.id.charAt(0) === 'b';
+    
     return {
       id: property.id,
       images: [
@@ -67,7 +73,9 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({ selectedLocation, filters }
       currency: '₹',
       nights: nights,
       rating: property.rating || 4.5,
-      isFavorite: false
+      isFavorite: false,
+      hasVirtualTour: hasVirtualTour,
+      isRemoteWorkFriendly: property.remoteWorkFriendly
     };
   };
 
@@ -87,6 +95,8 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({ selectedLocation, filters }
             nights={propertyData.nights}
             rating={propertyData.rating}
             isFavorite={propertyData.isFavorite}
+            hasVirtualTour={propertyData.hasVirtualTour}
+            isRemoteWorkFriendly={propertyData.isRemoteWorkFriendly}
           />
         );
       })}

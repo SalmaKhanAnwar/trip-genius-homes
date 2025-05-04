@@ -8,12 +8,18 @@ import Footer from '@/components/Footer';
 
 const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [remoteWorkOnly, setRemoteWorkOnly] = useState(false);
+  const [filters, setFilters] = useState({
+    remoteWorkOnly: false,
+    showVirtualTours: false,
+    showSuperhost: false,
+    flexibleDates: false
+  });
 
   const handleFilterChange = (filterType: string, value: boolean) => {
-    if (filterType === 'remoteWork') {
-      setRemoteWorkOnly(value);
-    }
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [filterType === 'remoteWork' ? 'remoteWorkOnly' : filterType]: value
+    }));
   };
 
   return (
@@ -25,12 +31,17 @@ const Index = () => {
           onLocationChange={setSelectedLocation} 
         />
         <FilterToggle 
-          filters={{ remoteWork: remoteWorkOnly }} 
+          filters={{ 
+            remoteWork: filters.remoteWorkOnly,
+            showVirtualTours: filters.showVirtualTours,
+            showSuperhost: filters.showSuperhost,
+            flexibleDates: filters.flexibleDates
+          }} 
           onFilterChange={handleFilterChange}
         />
         <PropertyGrid 
           selectedLocation={selectedLocation}
-          filters={{ remoteWorkOnly }}
+          filters={filters}
         />
       </main>
       <Footer />
