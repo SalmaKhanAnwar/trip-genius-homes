@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, User, Compass } from 'lucide-react';
+import { Search, User, Compass, Users, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
@@ -29,11 +29,25 @@ const Header = () => {
         </div>
 
         {/* User Area */}
-        <div className="flex items-center">
-          <Link to="/ai-assistant">
-            <Button variant="outline" size="sm" className="mr-4 border-airbnb-border text-airbnb-darkGray">
+        <div className="flex items-center gap-4">
+          <Link to="/travel-assistant">
+            <Button variant="outline" size="sm" className="border-airbnb-border text-airbnb-darkGray">
               <Compass className="h-4 w-4 mr-2 text-airbnb-pink" />
+              <span>Travel Assistant</span>
+            </Button>
+          </Link>
+          
+          <Link to="/ai-assistant">
+            <Button variant="outline" size="sm" className="border-airbnb-border text-airbnb-darkGray hidden sm:flex">
+              <Search className="h-4 w-4 mr-2 text-airbnb-pink" />
               <span>AI Assistant</span>
+            </Button>
+          </Link>
+          
+          <Link to="/community">
+            <Button variant="outline" size="sm" className="border-airbnb-border text-airbnb-darkGray hidden md:flex">
+              <Users className="h-4 w-4 mr-2 text-airbnb-pink" />
+              <span>Community</span>
             </Button>
           </Link>
           

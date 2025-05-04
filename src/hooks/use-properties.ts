@@ -15,7 +15,12 @@ export interface Property {
   remoteWorkFriendly: boolean;
 }
 
-export const useProperties = (location?: string, filters?: { remoteWorkOnly?: boolean }) => {
+export const useProperties = (location?: string, filters?: { 
+  remoteWorkOnly?: boolean,
+  showVirtualTours?: boolean,
+  showSuperhost?: boolean,
+  flexibleDates?: boolean
+}) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +46,7 @@ export const useProperties = (location?: string, filters?: { remoteWorkOnly?: bo
         
         // Transform the data to match the Property interface
         const transformedData = data?.map(item => {
-          // First, create a typed object with the properties we know exist
+          // Create a property object with known fields
           const property: Property = {
             id: item.id,
             name: item.name,
@@ -52,11 +57,10 @@ export const useProperties = (location?: string, filters?: { remoteWorkOnly?: bo
             distance: item.distance,
             availableFrom: item.availablefrom,
             availableTo: item.availableto,
-            // Safely handle the remoteworkfriendly property which might not be in the type definition
-            remoteWorkFriendly: false
+            remoteWorkFriendly: false // Default value
           };
           
-          // Then check if the remoteworkfriendly property exists in the raw data and is true
+          // Check if remoteworkfriendly exists and is true in the raw data
           if ('remoteworkfriendly' in item && item.remoteworkfriendly === true) {
             property.remoteWorkFriendly = true;
           }
@@ -64,10 +68,18 @@ export const useProperties = (location?: string, filters?: { remoteWorkOnly?: bo
           return property;
         }) || [];
         
-        // Apply remote work filter if specified
-        const filteredData = filters?.remoteWorkOnly
-          ? transformedData.filter(property => property.remoteWorkFriendly)
-          : transformedData;
+        // Apply filters
+        let filteredData = transformedData;
+        
+        if (filters?.remoteWorkOnly) {
+          filteredData = filteredData.filter(property => property.remoteWorkFriendly);
+        }
+        
+        // Additional filters could be implemented here
+        // For example, if we add a showSuperhost field to the database:
+        // if (filters?.showSuperhost) {
+        //   filteredData = filteredData.filter(property => property.isSuperhost);
+        // }
         
         setProperties(filteredData);
       } catch (err) {
@@ -79,7 +91,7 @@ export const useProperties = (location?: string, filters?: { remoteWorkOnly?: bo
     };
 
     fetchProperties();
-  }, [location, filters?.remoteWorkOnly]);
+  }, [location, filters?.remoteWorkOnly, filters?.showVirtualTours, filters?.showSuperhost, filters?.flexibleDates]);
 
   return { properties, loading, error };
 };

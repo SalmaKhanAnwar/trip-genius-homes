@@ -1,8 +1,17 @@
 
 import React from 'react';
-import { Heart, Star, Wifi, Compass } from 'lucide-react';
+import { Heart, Star, Wifi, Compass, Camera, Map, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { cn } from '@/lib/utils';
 
 interface PropertyCardProps {
   images: string[];
@@ -16,6 +25,9 @@ interface PropertyCardProps {
   isFavorite?: boolean;
   hasVirtualTour?: boolean;
   isRemoteWorkFriendly?: boolean;
+  arExperienceAvailable?: boolean;
+  hostVerified?: boolean;
+  guestCapacity?: number;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -29,12 +41,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   rating,
   isFavorite = false,
   hasVirtualTour = false,
-  isRemoteWorkFriendly = false
+  isRemoteWorkFriendly = false,
+  arExperienceAvailable = false,
+  hostVerified = false,
+  guestCapacity = 2
 }) => {
   const [activeImageIndex, setActiveImageIndex] = React.useState(0);
   const [isHovered, setIsHovered] = React.useState(false);
   const [liked, setLiked] = React.useState(isFavorite);
   const [isVirtualTourActive, setIsVirtualTourActive] = React.useState(false);
+  const [isARModeActive, setIsARModeActive] = React.useState(false);
 
   const nextImage = () => {
     setActiveImageIndex((prev) => (prev + 1) % images.length);
@@ -47,12 +63,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const toggleVirtualTour = () => {
     if (hasVirtualTour) {
       setIsVirtualTourActive(!isVirtualTourActive);
+      setIsARModeActive(false);
+    }
+  };
+
+  const toggleARMode = () => {
+    if (arExperienceAvailable) {
+      setIsARModeActive(!isARModeActive);
+      setIsVirtualTourActive(false);
     }
   };
 
   return (
     <div 
-      className="flex flex-col space-y-2"
+      className="flex flex-col space-y-2 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -76,23 +100,66 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               Exit 360° View
             </Button>
           </div>
+        ) : isARModeActive ? (
+          <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
+            <div className="relative w-full h-full">
+              <img 
+                src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5" 
+                alt="AR Experience" 
+                className="object-cover w-full h-full opacity-80"
+              />
+              <div className="absolute inset-0 flex items-center justify-center flex-col text-white">
+                <h3 className="text-xl font-bold mb-2">AR Experience</h3>
+                <p className="text-sm text-center px-4">
+                  Use your phone camera to explore this property in augmented reality
+                </p>
+              </div>
+            </div>
+            <Button 
+              onClick={toggleARMode}
+              className="absolute top-2 right-2 bg-white text-black hover:bg-gray-200 z-30"
+              size="sm"
+            >
+              Exit AR Mode
+            </Button>
+          </div>
         ) : (
           <>
-            {/* Standard Image View */}
-            <img 
-              src={images[activeImageIndex]} 
-              alt={`Property in ${location}`} 
-              className="object-cover w-full h-full"
-            />
+            {/* Image Carousel */}
+            <Carousel 
+              className="w-full h-full" 
+              onSelect={(index) => setActiveImageIndex(index)}
+            >
+              <CarouselContent className="h-full">
+                {images.map((image, index) => (
+                  <CarouselItem key={index} className="h-full">
+                    <AspectRatio ratio={1} className="h-full">
+                      <img 
+                        src={image} 
+                        alt={`Property in ${location} - image ${index + 1}`} 
+                        className="object-cover w-full h-full rounded-xl"
+                      />
+                    </AspectRatio>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {isHovered && images.length > 1 && (
+                <>
+                  <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8" />
+                  <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8" />
+                </>
+              )}
+            </Carousel>
 
             {/* Property Tags */}
-            <div className="absolute top-3 left-3 flex space-x-2 z-10">
+            <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10 max-w-[70%]">
               {isRemoteWorkFriendly && (
                 <span className="bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
                   <Wifi className="h-3 w-3 mr-1 text-airbnb-pink" />
                   Remote Work
                 </span>
               )}
+              
               {hasVirtualTour && (
                 <span 
                   className="bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center cursor-pointer hover:bg-gray-100"
@@ -100,6 +167,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 >
                   <Compass className="h-3 w-3 mr-1 text-airbnb-pink" />
                   360° Tour
+                </span>
+              )}
+              
+              {arExperienceAvailable && (
+                <span 
+                  className="bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center cursor-pointer hover:bg-gray-100"
+                  onClick={toggleARMode}
+                >
+                  <Camera className="h-3 w-3 mr-1 text-airbnb-pink" />
+                  AR View
+                </span>
+              )}
+              
+              {hostVerified && (
+                <span className="bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                  <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
+                  Verified Host
                 </span>
               )}
             </div>
@@ -118,28 +202,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               />
             </button>
 
-            {/* Navigation arrows - Only show when hovered */}
-            {images.length > 1 && isHovered && (
-              <>
-                <button 
-                  onClick={prevImage}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1.5 shadow-md opacity-90 hover:opacity-100"
-                >
-                  <svg viewBox="0 0 16 16" className="h-3 w-3 fill-current">
-                    <path d="M9.41 14.58L4.83 10l4.58-4.59L10.99 7 8 10l2.99 3-1.58 1.58z" />
-                  </svg>
-                </button>
-                <button 
-                  onClick={nextImage}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1.5 shadow-md opacity-90 hover:opacity-100"
-                >
-                  <svg viewBox="0 0 16 16" className="h-3 w-3 fill-current">
-                    <path d="M6.58 14.58L11.17 10l-4.59-4.59L5 7l3 3-3 3 1.58 1.58z" />
-                  </svg>
-                </button>
-              </>
-            )}
-
             {/* Image indicator dots */}
             {images.length > 1 && (
               <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
@@ -153,6 +215,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 ))}
               </div>
             )}
+            
+            {/* Guest capacity */}
+            <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center">
+              <Users className="h-3 w-3 mr-1 text-airbnb-darkGray" />
+              {guestCapacity}
+            </div>
           </>
         )}
       </div>
@@ -167,7 +235,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </div>
         )}
       </div>
-      <div className="text-airbnb-lightGray">{distance} away</div>
+      <div className="flex justify-between items-center">
+        <span className="text-airbnb-lightGray">{distance} away</span>
+        <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+          <Map className="h-3 w-3 inline mr-1" />
+          View on map
+        </span>
+      </div>
       <div className="text-airbnb-lightGray">{dates}</div>
       <div>
         <span className="font-medium">{currency}{price}</span> for {nights} nights
