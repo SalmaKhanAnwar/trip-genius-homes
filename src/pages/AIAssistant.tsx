@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Compass, Map, Calendar, Clock, Mic, MicOff, Bot, Volume } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -27,6 +26,9 @@ interface Suggestion {
 }
 
 const AIAssistant = () => {
+  // Use your provided Gemini API key
+  const defaultApiKey = 'AIzaSyAe4oFvkqwwozADpkzecvDNPFcKU1gqrCc';
+  
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -36,8 +38,8 @@ const AIAssistant = () => {
       timestamp: new Date()
     }
   ]);
-  const [apiKey, setApiKey] = useState('');
-  const [isApiKeySet, setIsApiKeySet] = useState(false);
+  const [apiKey, setApiKey] = useState(defaultApiKey);
+  const [isApiKeySet, setIsApiKeySet] = useState(true); // Set to true because we have a default key
   const [voiceMode, setVoiceMode] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -133,6 +135,7 @@ const AIAssistant = () => {
     setMessage(suggestion.text);
   };
 
+  // This is kept but will allow users to change the API key if needed
   const handleSetApiKey = () => {
     if (apiKey.trim() !== '') {
       setIsApiKeySet(true);
@@ -143,6 +146,7 @@ const AIAssistant = () => {
   };
 
   return (
+    
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow flex flex-col p-6 md:p-10 lg:p-20">

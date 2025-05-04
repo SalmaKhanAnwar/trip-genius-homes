@@ -74,10 +74,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
-  // Handle carousel index change
-  const handleCarouselChange = (index: number) => {
-    setActiveImageIndex(index);
-  };
+  // Handle carousel index change - fixed to use with Carousel's onSelect prop
+  const handleCarouselChange = React.useCallback((api: any) => {
+    const currentIndex = api?.selectedScrollSnap();
+    if (currentIndex !== undefined) {
+      setActiveImageIndex(currentIndex);
+    }
+  }, []);
 
   return (
     <div 
@@ -133,7 +136,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             {/* Image Carousel */}
             <Carousel 
               className="w-full h-full" 
-              onSelect={handleCarouselChange}
+              setApi={(api) => {
+                api?.on('select', () => handleCarouselChange(api));
+              }}
             >
               <CarouselContent className="h-full">
                 {images.map((image, index) => (
