@@ -50,7 +50,8 @@ export const useProperties = (location?: string, filters?: { remoteWorkOnly?: bo
           distance: item.distance,
           availableFrom: item.availablefrom,
           availableTo: item.availableto,
-          remoteWorkFriendly: item.remoteworkfriendly || false // Default to false if not present
+          // Handle the case where remoteworkfriendly might not exist in the data
+          remoteWorkFriendly: item.remoteworkfriendly === true
         })) || [];
         
         // Apply remote work filter if specified
